@@ -18,28 +18,28 @@
 
   class Marquee3k {
     constructor(element, options) {
-      this.element = element;
-      this.selector = options.selector;
-      this.speed = element.dataset.speed || 0.25;
-      this.pausable = element.dataset.pausable;
-      this.reverse = element.dataset.reverse;
-      this.paused = false;
-      this.parent = element.parentElement;
-      this.parentProps = this.parent.getBoundingClientRect();
-      this.content = element.children[0];
-      this.innerContent = this.content.innerHTML;
-      this.wrapStyles = '';
-      this.offset = 0;
+        this.element = element;
+        this.selector = options.selector;
+        this.speed = element.dataset.speed || 0.25;
+        this.pausable = element.dataset.pausable;
+        this.reverse = element.dataset.reverse;
+        this.paused = false;
+        this.parent = element.parentElement;
+        this.parentProps = this.parent.getBoundingClientRect();
+        this.content = element.children[0];
+        this.innerContent = this.content.innerHTML;
+        this.wrapStyles = '';
+        this.offset = 0;
 
-      this._setupWrapper();
-      this._setupContent();
-      this._setupEvents();
+        this._setupWrapper();
+        this._setupContent();
+        this._setupEvents();
 
-      this.wrapper.appendChild(this.content);
-      this.element.appendChild(this.wrapper);
+        this.wrapper.appendChild(this.content);
+        this.element.appendChild(this.wrapper);
     }
 
-    _setupWrapper() {
+      _setupWrapper() {
       this.wrapper = document.createElement('div');
       this.wrapper.classList.add('marquee3k__wrapper');
       this.wrapper.style.whiteSpace = 'nowrap';
@@ -121,6 +121,10 @@
     }
 
     static init(options = { selector: 'marquee3k' }) {
+        window.removeEventListener('resize', resizeListener);
+        if (window.MARQUEES_ANIMATIONID) {
+            window.cancelAnimationFrame(window.MARQUEES_ANIMATIONID);
+        }
       window.MARQUEES = [];
       const marquees = Array.from(document.querySelectorAll(`.${options.selector}`));
       let previousWidth = window.innerWidth;
@@ -138,23 +142,25 @@
         for (let i = 0; i < MARQUEES.length; i++) {
           MARQUEES[i].animate();
         }
-        window.requestAnimationFrame(animate);
+        window.MARQUEES_ANIMATIONID = window.requestAnimationFrame(animate);
       }
 
-      window.addEventListener('resize', () => {
-        clearTimeout(timer);
+      function resizeListener() {
+          clearTimeout(timer);
 
-        timer = setTimeout(() => {
-          const isLarger = previousWidth < window.innerWidth;
-          const difference = window.innerWidth - previousWidth;
+          timer = setTimeout(() => {
+              const isLarger = previousWidth < window.innerWidth;
+              const difference = window.innerWidth - previousWidth;
 
-          for (let i = 0; i < MARQUEES.length; i++) {
-            MARQUEES[i].repopulate(difference, isLarger);
-          }
+              for (let i = 0; i < MARQUEES.length; i++) {
+                  MARQUEES[i].repopulate(difference, isLarger);
+              }
 
-          previousWidth = this.innerWidth;
-        });
-      }, 250);
+              previousWidth = this.innerWidth;
+          }, 250);
+      }
+
+      window.addEventListener('resize', resizeListener);
     }
   }
 

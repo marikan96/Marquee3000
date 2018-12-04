@@ -4,3 +4,7 @@ npm-debug.log
 package.json
 
 .eslintrc.json
+
+.idea
+
+node_modules

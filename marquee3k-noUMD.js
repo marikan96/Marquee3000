@@ -112,6 +112,10 @@ class Marquee3k {
   }
 
   static init(options = { selector: 'marquee3k' }) {
+      window.removeEventListener('resize', resizeListener);
+      if (window.MARQUEES_ANIMATIONID) {
+          window.cancelAnimationFrame(window.MARQUEES_ANIMATIONID);
+      }
     window.MARQUEES = [];
     const marquees = Array.from(document.querySelectorAll(`${options.selector}`));
     let previousWidth = window.innerWidth;
@@ -130,23 +134,25 @@ class Marquee3k {
         MARQUEES[i].animate();
       }
 
-      window.requestAnimationFrame(animate);
+        window.MARQUEES_ANIMATIONID = window.requestAnimationFrame(animate);
     }
 
-    window.addEventListener('resize', () => {
-      clearTimeout(timer);
+    function resizeListener() {
+        clearTimeout(timer);
 
-      timer = setTimeout(() => {
-        const isLarger = previousWidth < window.innerWidth;
-        const difference = window.innerWidth - previousWidth;
+        timer = setTimeout(() => {
+            const isLarger = previousWidth < window.innerWidth;
+            const difference = window.innerWidth - previousWidth;
 
-        for (let i = 0; i < MARQUEES.length; i++) {
-          MARQUEES[i].repopulate(difference, isLarger);
-        }
+            for (let i = 0; i < MARQUEES.length; i++) {
+                MARQUEES[i].repopulate(difference, isLarger);
+            }
 
-        previousWidth = this.innerWidth;
-      });
-    }, 250);
+            previousWidth = this.innerWidth;
+        }, 250);
+    }
+
+    window.addEventListener('resize', resizeListener);
   }
 }
 
